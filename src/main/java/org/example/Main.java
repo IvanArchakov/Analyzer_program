@@ -12,7 +12,7 @@ public class Main {
     public static int lengthText = 100_000;
 
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         Thread thread = new Thread(() -> {
             for (int i = 0; i < sizeText; i++) {
                 String text = generateText("abc", lengthText);
@@ -27,49 +27,10 @@ public class Main {
         });
         thread.start();
 
-        Thread threadA = new Thread(() -> {
-            char letter = 'a';
-            long maxLength;
-            try {
-                maxLength = findLetter(queueA, letter);
-            } catch (InterruptedException e) {
-                System.out.printf("Thread %s interrupted \n" + Thread.currentThread().getName());
-                maxLength = -1;
-            }
-            System.out.printf("Максимальное количество символов %s в тексте %d \n", letter, maxLength);
-        });
+        threadABC(queueA, 'a');
+        threadABC(queueB, 'b');
+        threadABC(queueC, 'c');
 
-        Thread threadB = new Thread(() -> {
-            char letter = 'b';
-            long maxLength;
-            try {
-                maxLength = findLetter(queueB, letter);
-            } catch (InterruptedException e) {
-                System.out.printf("Thread %s interrupted \n" + Thread.currentThread().getName());
-                maxLength = -1;
-            }
-            System.out.printf("Максимальное количество символов %s в тексте %d \n", letter, maxLength);
-        });
-
-        Thread threadC = new Thread(() -> {
-            char letter = 'c';
-            long maxLength;
-            try {
-                maxLength = findLetter(queueC, letter);
-            } catch (InterruptedException e) {
-                System.out.printf("Thread %s interrupted \n" + Thread.currentThread().getName());
-                maxLength = -1;
-            }
-            System.out.printf("Максимальное количество символов %s в тексте %d \n", letter, maxLength);
-        });
-
-        threadA.start();
-        threadB.start();
-        threadC.start();
-
-        threadA.join();
-        threadB.join();
-        threadC.join();
     }
 
     public static long findLetter(ArrayBlockingQueue<String> queue, char letter) throws InterruptedException {
@@ -93,5 +54,19 @@ public class Main {
             text.append(letters.charAt(random.nextInt(letters.length())));
         }
         return text.toString();
+    }
+
+    public static void threadABC(ArrayBlockingQueue<String> queueABC, char letter) {
+        Thread thread = new Thread(() -> {
+            long maxLength;
+            try {
+                maxLength = findLetter(queueABC, letter);
+            } catch (InterruptedException e) {
+                System.out.printf("Thread %s interrupted \n" + Thread.currentThread().getName());
+                maxLength = -1;
+            }
+            System.out.printf("Максимальное количество символов %s в тексте %d \n", letter, maxLength);
+        });
+        thread.start();
     }
 }
